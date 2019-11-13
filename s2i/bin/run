@@ -1,0 +1,77 @@
+#!/bin/bash -e
+#
+# S2I run script for the 'quarkus-s2i' image.
+# The run script executes the server that runs your application.
+#
+# For more information see the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+echo "run.sh at $(date +%H:%M:%S.%s)"
+
+export AUTODEPLOY_FOLDER=/deployments
+export QUARKUS_DATASOURCE_URL="jdbc:postgresql://${DATABASE_SERVER}:5432/${DATABASE_NAME}"
+export QUARKUS_DATASOURCE_USERNAME=${DATABASE_USER}
+export QUARKUS_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+
+reduceMemory()
+{
+    MEM=$1
+    PERCENT=$2
+
+    if [ -z $MEM ]
+    then
+        MEM=512mi
+    fi
+
+    if [ -z $PERCENT ]
+    then
+        PERCENT=90
+    fi
+
+    if echo $MEM | grep -i gi >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/gi//Ig')
+        MEM=$(expr $MEM \* 1073741824)
+    fi
+
+    if echo $MEM | grep -i g >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/g//Ig')
+        MEM=$(expr $MEM \* 1073741824)
+    fi
+
+    if echo $MEM | grep -i mi >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/mi//Ig')
+        MEM=$(expr $MEM \* 1048576)
+    fi
+
+    if echo $MEM | grep -i m >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/m//Ig')
+        MEM=$(expr $MEM \* 1048576)
+    fi
+
+    if echo $MEM | grep -i ki >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/ki//Ig')
+        MEM=$(expr $MEM \* 1024)
+    fi
+
+    if echo $MEM | grep -i k >/dev/null
+    then
+        MEM=$(echo $MEM | sed 's/k//Ig')
+        MEM=$(expr $MEM \* 1024)
+    fi
+
+    MEM=$(expr $MEM \* $PERCENT / 100 / 1048576)
+    echo "${MEM}m"
+}
+
+XMS=`reduceMemory $MEMORY_REQUEST $MEMORY_PERCENT`
+XMX=`reduceMemory $MEMORY_LIMIT $MEMORY_PERCENT`
+
+cd target
+echo java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Xms${XMS} -Xmx${XMX} -jar *-runner.jar
+exec java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Xms${XMS} -Xmx${XMX} -jar *-runner.jar
