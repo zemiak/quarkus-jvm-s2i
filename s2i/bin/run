@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-echo "run.sh at $(date +%H:%M:%S.%s)"
-
 export AUTODEPLOY_FOLDER=/deployments
 export QUARKUS_DATASOURCE_URL="jdbc:postgresql://${DATABASE_SERVER}:5432/${DATABASE_NAME}"
 export QUARKUS_DATASOURCE_USERNAME=${DATABASE_USER}
