@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+cd .m2
+tar cf - .
