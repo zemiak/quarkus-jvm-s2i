@@ -75,8 +75,8 @@ container_port() {
 }
 
 run_s2i_build() {
-  # s2i build --incremental=true ${s2i_args} ${test_dir}/test-app ${IMAGE_NAME} ${IMAGE_NAME}-testapp
-  s2i build --incremental=false ${s2i_args} ${test_dir}/test-app ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+  # s2i build --incremental=true ${s2i_args} ${test_dir}/app ${IMAGE_NAME} ${IMAGE_NAME}-testapp
+  s2i build --incremental=false ${s2i_args} ${test_dir}/app ${IMAGE_NAME} ${IMAGE_NAME}-testapp
 }
 
 prepare() {
@@ -85,7 +85,7 @@ prepare() {
     exit 1
   fi
   # s2i build requires the application is a valid 'Git' repository
-  pushd ${test_dir}/test-app >/dev/null
+  pushd ${test_dir}/app >/dev/null
   git init
   git config user.email "build@localhost" && git config user.name "builder"
   git add -A && git commit -m "Sample commit"
@@ -106,6 +106,7 @@ cleanup() {
   if image_exists ${IMAGE_NAME}-testapp; then
     docker rmi ${IMAGE_NAME}-testapp
   fi
+  rm -rf ./test/test-app
 }
 
 check_result() {

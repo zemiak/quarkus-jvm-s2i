@@ -73,5 +73,5 @@ XMS=`reduceMemory $MEMORY_REQUEST $MEMORY_PERCENT`
 XMX=`reduceMemory $MEMORY_LIMIT $MEMORY_PERCENT`
 
 cd target
-echo java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Xms${XMS} -Xmx${XMX} -jar *-runner.jar
+echo "$(date +%H:%M:%S.%s) --> exec java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Xms${XMS} -Xmx${XMX} -jar *-runner.jar"
 exec java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Xms${XMS} -Xmx${XMX} -jar *-runner.jar
